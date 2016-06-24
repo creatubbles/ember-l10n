@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import GetText from 'i18n';
+import fetch from "ember-network/fetch";
 
 /**
  * This service translates through gettext.js.
@@ -402,10 +403,16 @@ export default Ember.Service.extend(Ember.Evented, {
     }
 
     // otherwise load json file from assets
-    ajax.request(url).then(
-      successCallback,
-      failureCallback
-    );
+    fetch(url)
+      .then((response) => {
+        if(response.ok) {
+          response.json().then((jsonBody) => successCallback(jsonBody));
+        } else {
+          // TODO error handling here
+          console.log("Network response was not ok.");
+        }
+      })
+      .catch(failureCallback);
   }
 
 });
